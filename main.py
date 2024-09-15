@@ -7,6 +7,19 @@ import time
 pygame.init()
 screen = pygame.display.set_mode((300, 300), pygame.RESIZABLE)
 
+
+def snap_pixels(pixels: np.ndarray, colors: list[tuple[int, int, int]]):
+    """Snaps every pixel to the closest color in colors, by euclidean distance"""
+
+    def distance(a: tuple[int, int, int], b: tuple[int, int, int]):
+        return sum((a[i] - b[i]) ** 2 for i in range(3)) ** 0.5
+
+    def closest_color(color: tuple[int, int, int]):
+        return min(colors, key=lambda x: distance(x, color))
+
+    return np.array([[closest_color(pixel) for pixel in row] for row in pixels])
+
+
 @dataclass
 class Point:
     x: int
@@ -40,12 +53,6 @@ class Point:
     @staticmethod
     def all_directions():
         return [Point(0, -1), Point(1, 0), Point(0, 1), Point(-1, 0)]
-
-"""
-f v is either a hall or a corner, w is called the “diagonal”
-of v, and is denoted diag(v). We observe that diagonals are
-uniquely specified.
-"""
 
 class Robot:
     def __init__(self, field: Field):
@@ -128,6 +135,7 @@ class Field:
     def __init__(self, path: str):
         image = pygame.image.load(path).convert()
         pixels = pygame.surfarray.array3d(image)
+        pixels = snap_pixels(pixels, [Field.WALL_COLOR, Field.START_COLOR, (255, 255, 255)])
         #pad array with WALL_COLOR
         padded_pixels = np.zeros((pixels.shape[0] + 2, pixels.shape[1] + 2, 3), dtype=np.uint8)
         padded_pixels[1:-1, 1:-1] = pixels[:, :]
@@ -211,7 +219,7 @@ background_colour = (255, 255, 255)
 running = True
 
 
-field = Field("palyak/palya4.png")
+field = Field("palyak/test_snap.png")
 
 #field.spawn_robot()
 
