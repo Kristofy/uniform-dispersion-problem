@@ -9,16 +9,12 @@ import random
 import pygame_widgets
 from pygame_widgets.textbox import TextBox
 from pygame_widgets.slider import Slider
-
-pygame.init()
-screen = pygame.display.set_mode((300, 300), pygame.RESIZABLE)
-
-pygame.font.init()
-
-my_font = pygame.font.SysFont('Comic Sans MS', 20)
+import argparse
 
 robot_type : Literal["sync", "async"] = "sync"
+background_colour = (255, 255, 255)
 p: float = 0
+screen = None
 
 def snap_pixels(pixels: np.ndarray, colors: list[tuple[int, int, int]]):
     """Snaps every pixel to the closest color in colors, by euclidean distance"""
@@ -332,19 +328,24 @@ class Field:
 #random.seed(1)
 
 
-if __name__ == "__main__":
-    print(sys.argv)
-    if len(sys.argv) == 3:
-        if sys.argv[1] == "async":
-            print("async")
-            robot_type = "async"
-            p = float(sys.argv[2])
-    background_colour = (255, 255, 255)
+def main(file_path: str):
+
+    global screen
+
+    pygame.init()
+    screen = pygame.display.set_mode((300, 300), pygame.RESIZABLE)
+
+    pygame.font.init()
+    my_font = pygame.font.SysFont('Comic Sans MS', 20)
+
+
+    field = Field(file_path)
+
     running = True
     
     slider = Slider(screen, 50, 100, 300, 20, min=1, max=200, step=1)
     output_box = TextBox(screen, 50, 140, 100, 40, fontSize=30)
-    field = Field("palyak/palya4.png")
+    
 
     while running:
         for event in pygame.event.get():
@@ -354,6 +355,7 @@ if __name__ == "__main__":
         fps = int(slider.getValue())
         output_box.setText(f"{fps}")
         screen.fill(background_colour)
+       
 
         # Draws the slider
         pygame_widgets.update(pygame.event.get())
@@ -363,3 +365,33 @@ if __name__ == "__main__":
         field.post_tick()
         pygame.display.flip()
         pygame.time.Clock().tick(fps)
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(add_help=True)
+
+    parser.add_argument('file', type=str, action="store", help='The file to use as the map')
+ 
+    parser.add_argument(
+        "--async",
+        "-a",
+        dest="param_async",
+        action="store",
+        type=float,
+        required=False,
+        help="Run the async simulated version",
+    )
+
+    args = parser.parse_args()
+
+    
+    is_async = args.param_async is not None
+    p = args.param_async
+    file_path = args.file
+    
+    print(args)
+
+    if is_async:
+        robot_type = "async"
+        
+
+    main(file_path)
