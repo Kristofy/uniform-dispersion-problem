@@ -9,3 +9,6 @@ make_python_env:
 
 run:
 	./.venv/bin/python main.py
+
+async_run:
+	./.venv/bin/python main.py async 0.2

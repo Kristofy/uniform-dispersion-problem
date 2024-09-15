@@ -1,12 +1,24 @@
 from __future__ import annotations
 from dataclasses import dataclass
+from typing import Literal
 import pygame
 import numpy as np
 import time
+import sys
+import random
+import pygame_widgets
+from pygame_widgets.textbox import TextBox
+from pygame_widgets.slider import Slider
 
 pygame.init()
 screen = pygame.display.set_mode((300, 300), pygame.RESIZABLE)
 
+pygame.font.init()
+
+my_font = pygame.font.SysFont('Comic Sans MS', 20)
+
+robot_type : Literal["sync", "async"] = "sync"
+p: float = 0
 
 def snap_pixels(pixels: np.ndarray, colors: list[tuple[int, int, int]]):
     """Snaps every pixel to the closest color in colors, by euclidean distance"""
@@ -55,30 +67,30 @@ class Point:
         return [Point(0, -1), Point(1, 0), Point(0, 1), Point(-1, 0)]
 
 class Robot:
+
+    counter = 0
+
+    @property
+    def secondary_direction(self):
+        return self.primary_direction.rot90()
     def __init__(self, field: Field):
+        self.id = Robot.counter
+        Robot.counter += 1
         self.field = field
         self.position = field.start
         self.next_position = self.position
         self.is_settled = False
         self.primary_direction = None
         self.history : list[Point] = []
+        self.active = True
 
-    @property
-    def secondary_direction(self):
-        return self.primary_direction.rot90()
-
-    def render(self):
-        cell_size = self.field.cell_size
-        color = (0, 255, 0) if self.is_settled else (0, 0, 255)
-        pygame.draw.circle(screen, color, (self.position.x * cell_size + cell_size // 2, self.position.y * cell_size + cell_size // 2), cell_size // 2)
-    
     def move(self):
         if self.is_settled:
-            self
-        self.history.append(self.position)
+            return
+        if not self.history or self.history[-1] != self.position:
+            self.history.append(self.position)
         self.position = self.next_position
         self.next_position = self.position
-
 
     @property
     def diag(self):
@@ -88,7 +100,21 @@ class Robot:
                 total = total + dir
         return self.position - total
 
+    def pre_tick(self):
+        pass
 
+    def __str__(self):
+        return f"Robot({self.position})"
+
+    def render(self):
+        cell_size = self.field.cell_size
+        color = (0, 255, 0) if self.is_settled else ( (0, 0, 255) if self.active else (0, 0, 122))
+        pygame.draw.circle(screen, color, (self.position.x * cell_size + cell_size // 2, self.position.y * cell_size + cell_size // 2), cell_size // 2)
+        #text = my_font.render(str(self.id), True, (255, 255, 0))
+        #screen.blit(text, (self.position.x * cell_size + cell_size // 2 - 10, self.position.y * cell_size - cell_size // 4 - 10))
+    
+class SyncRobot(Robot):
+    
     def pre_tick(self):
         #self.next_position = self.position.peak_up()
         v = self.position
@@ -115,7 +141,7 @@ class Robot:
                 self.field.is_occupied(v.peak_left()) + \
                 self.field.is_occupied(v.peak_right()) == 3:
                 self.is_settled = True
-            elif self.history[-2] == self.diag or not self.field.is_occupied(self.diag):
+            elif len(self.history) < 2 or self.history[-2] == self.diag or not self.field.is_occupied(self.diag):
                 self.is_settled = True
             else:
                 for dir in Point.all_directions():
@@ -126,7 +152,83 @@ class Robot:
                         break
     
     def __str__(self):
-        return f"Robot({self.position})"
+        return f"SyncRobot({self.position})"
+
+class AsyncRobot(Robot):
+    @property
+    def diag(self):
+        total = Point(0, 0)
+        for dir in Point.all_directions():
+            if self.field.is_wall_or_settled_robot(self.position+dir):
+                total = total + dir
+        return self.position - total
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+    
+    def pre_tick(self):
+        if random.random() > p:
+            self.active = False
+            return
+        self.active = True
+        v = self.position
+
+        if self.field.is_wall_or_settled_robot(v.peak_up()) and \
+            self.field.is_wall_or_settled_robot(v.peak_down()) and \
+            self.field.is_wall_or_settled_robot(v.peak_left()) and \
+            self.field.is_wall_or_settled_robot(v.peak_right()):
+            self.is_settled = True
+            return
+        elif self.primary_direction is None:
+            
+            for dir in Point.all_directions():
+                d = v + dir
+                if self.field.is_broadcasting_robot(d):
+                    return
+            
+            for dir in Point.all_directions():
+                d = v + dir
+                if not self.field.is_occupied(d):
+                    self.primary_direction = dir
+                    break
+
+        # If their is a broadcasting robot in the primary direction then wait
+        if self.field.is_broadcasting_robot(v+self.primary_direction):
+            return
+        
+        # If we can go towards to primary direction then take the step
+        if(not self.field.is_occupied(v+self.primary_direction)):
+            self.next_position = v + self.primary_direction
+            return
+        
+        # If their is a broadcasting robot in the secondary direction then wait
+        if self.field.is_broadcasting_robot(v+self.secondary_direction):
+            return
+        
+        # If we can go towards to secondary direction then take the step
+        if (not self.field.is_occupied(v+self.secondary_direction)):
+            self.next_position = v + self.secondary_direction
+            return
+      
+        
+        if self.field.is_wall_or_settled_robot(v.peak_up()) + \
+            self.field.is_wall_or_settled_robot(v.peak_down()) + \
+            self.field.is_wall_or_settled_robot(v.peak_left()) + \
+            self.field.is_wall_or_settled_robot(v.peak_right()) == 3:
+            self.is_settled = True
+        elif not self.field.is_occupied(self.diag) or self.field.is_broadcasting_robot(self.diag):
+            self.is_settled = True
+        else:
+            for dir in Point.all_directions():
+                d = v + dir
+                if not self.field.is_wall_or_settled_robot(d) and d != self.history[-1]:
+                    self.primary_direction = dir
+                    self.next_position = v + self.primary_direction
+                    break
+    
+    def __str__(self):
+        return f"AsyncRobot({self.position})"
+
 class Field:
     # WALL = (25)
     WALL_COLOR: tuple[int, int, int] = (0, 0, 0)
@@ -151,7 +253,7 @@ class Field:
         self.height, self.width, _ = pixels.shape
         # self.start : Point =        
         self.is_wall: list[list[bool]] = [[all(x == Field.WALL_COLOR) for x in y] for y in pixels]
-        self.is_robot: list[list[bool]] = [[False] * self.width for _ in range(self.height)]
+        self.robot_matrix: list[list[Robot | None]] = [[None] * self.width for _ in range(self.height)]
         
         self.robots : list[Robot] = []
 
@@ -184,19 +286,23 @@ class Field:
         for robot in self.robots:  
             robot.render()
 
-    def update_is_robot(self):
-        self.is_robot = [[False] * self.width for _ in range(self.height)]
+    def update_robot_matrix(self):
+        self.robot_matrix = [[None] * self.width for _ in range(self.height)]
         for robot in self.robots:
-            self.is_robot[robot.position.y][robot.position.x] = True
+            self.robot_matrix[robot.position.y][robot.position.x] = robot
 
     def spawn_robot(self):
-        if not self.is_robot[self.start.y][self.start.x]:
-            self.robots.append(Robot(self))
+        if self.robot_matrix[self.start.y][self.start.x] is None:
+            if robot_type == "sync":
+                self.robots.append(SyncRobot(self))
+            else:
+                if random.random() < p:
+                    self.robots.append(AsyncRobot(self))
     
     def move_robots(self):
         for robot in self.robots:
             robot.move()
-        self.update_is_robot()
+        self.update_robot_matrix()
     
     def pre_tick(self):
         for robot in self.robots:
@@ -211,28 +317,49 @@ class Field:
         self.render()
     
     def is_occupied(self, point: Point):
-        return self.is_robot[point.y][point.x] or self.is_wall[point.y][point.x]
+        return self.robot_matrix[point.y][point.x] is not None or self.is_wall[point.y][point.x]
+    
+    def is_wall_or_settled_robot(self, point: Point):
+        return self.is_occupied(point) and not self.is_broadcasting_robot(point)
+    
+    def is_broadcasting_robot(self, point: Point):
+        robot = self.robot_matrix[point.y][point.x]
+        return robot and not robot.is_settled
+
+        # return  is not None and not self.robot_matrix[point.y][point.x].is_settled
+
+    
+#random.seed(1)
 
 
-background_colour = (255, 255, 255)
+if __name__ == "__main__":
+    print(sys.argv)
+    if len(sys.argv) == 3:
+        if sys.argv[1] == "async":
+            print("async")
+            robot_type = "async"
+            p = float(sys.argv[2])
+    background_colour = (255, 255, 255)
+    running = True
+    
+    slider = Slider(screen, 50, 100, 300, 20, min=1, max=200, step=1)
+    output_box = TextBox(screen, 50, 140, 100, 40, fontSize=30)
+    field = Field("palyak/palya4.png")
 
-running = True
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT: 
+                running = False
 
+        fps = int(slider.getValue())
+        output_box.setText(f"{fps}")
+        screen.fill(background_colour)
 
-field = Field("palyak/test_snap.png")
-
-#field.spawn_robot()
-
-#image = pygame.image.load("palyak/palya1.png").convert()
-
-#pixel_array = pygame.surfarray.array3d(image)
-
-while running:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT: 
-            running = False
-    screen.fill(background_colour) 
-    field.pre_tick()
-    field.post_tick()
-    pygame.display.flip()
-    time.sleep(0.01)
+        # Draws the slider
+        pygame_widgets.update(pygame.event.get())
+        
+        
+        field.pre_tick()
+        field.post_tick()
+        pygame.display.flip()
+        pygame.time.Clock().tick(fps)
