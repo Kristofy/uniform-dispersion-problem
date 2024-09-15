@@ -211,7 +211,7 @@ background_colour = (255, 255, 255)
 running = True
 
 
-field = Field("palyak/palya2.png")
+field = Field("palyak/palya4.png")
 
 #field.spawn_robot()
 
@@ -227,4 +227,4 @@ while running:
     field.pre_tick()
     field.post_tick()
     pygame.display.flip()
-    time.sleep(0.1)
+    time.sleep(0.01)
