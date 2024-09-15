@@ -77,7 +77,7 @@ class Robot:
     def diag(self):
         total = Point(0, 0)
         for dir in Point.all_directions():
-            if self.field.is_occupied(dir):
+            if self.field.is_occupied(self.position+dir):
                 total = total + dir
         return self.position - total
 
@@ -108,7 +108,7 @@ class Robot:
                 self.field.is_occupied(v.peak_left()) + \
                 self.field.is_occupied(v.peak_right()) == 3:
                 self.is_settled = True
-            elif (self.history[-2] - v).abs() == Point(1, 1) or not self.field.is_occupied(self.diag):
+            elif self.history[-2] == self.diag or not self.field.is_occupied(self.diag):
                 self.is_settled = True
             else:
                 for dir in Point.all_directions():
@@ -212,6 +212,8 @@ running = True
 
 
 field = Field("palyak/palya2.png")
+
+#field.spawn_robot()
 
 #image = pygame.image.load("palyak/palya1.png").convert()
 
