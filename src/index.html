@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Uniform Dispersion Problem</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <script src="app.js" type="module" defer></script>
+</head>
+
+<body class="bg-gray-100">
+    <div class="flex flex-col md:flex-row h-screen">
+        <!-- Canvas Section -->
+        <div class="flex-1">
+
+            <div class="p-4 h-full">
+                <canvas id="main-canvas" class="w-full h-full"></canvas>
+            </div>
+        </div>
+        <!-- Settings Menu -->
+        <div class="bg-white p-4 shadow-lg md:w-1/4 w-full md:h-full h-auto">
+            <h2 class="text-xl font-bold mb-4">Settings</h2>
+            <div class="mb-4">
+                <label for="p-slider" class="block text-sm font-medium text-gray-700">P(Active)</label>
+                <input type="range" id="p-slider" name="p-slider" min="0.01" max="1" value="0.5" step="0.01"
+                    class="w-full mt-2">
+            </div>
+            <div class="mb-4">
+                <label for="speed-slider" class="block text-sm font-medium text-gray-700">Simulation Speed (seconds per
+                    tick)</label>
+                <input type="range" id="speed-slider" name="speedSlider" min="0.01" max="2" step="0.01" value="1"
+                    class="w-full mt-2">
+            </div>
+            <div class="mb-4">
+                <div class="flex flex-wrap gap-2">
+                    <button id="start-pause-button" class="bg-blue-500 text-white px-4 py-2 rounded">Start</button>
+                    <button id="reset-button" class="bg-red-500 text-white px-4 py-2 rounded">Restart</button>
+                    <button id="level-selector-button" class="bg-green-500 text-white px-4 py-2 rounded">Select
+                        Level</button>
+                </div>
+
+                <!-- Level Selector Modal -->
+                <div id="level-selector-modal"
+                    class="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center hidden">
+                    <div class="bg-white p-4 rounded shadow-lg max-w-3xl w-full">
+                        <h2 class="text-xl font-bold mb-4">Select a Level</h2>
+                        <style>
+                            #level-thumbnails img {
+                                width: 100px;
+                                height: 100px;
+                                object-fit: cover;
+                                image-rendering: pixelated;
+                                border: 2px solid #ccc;
+                                border-radius: 8px;
+                                transition: transform 0.2s, border-color 0.2s;
+                            }
+
+                            #level-thumbnails img:hover {
+                                transform: scale(1.1);
+                                border-color: #000;
+                            }
+                        </style>
+                        <div id="level-thumbnails" class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            <!-- Thumbnails will be loaded here -->
+                        </div>
+                        <button id="close-modal-button"
+                            class="bg-red-500 text-white px-4 py-2 rounded mt-4">Close</button>
+                    </div>
+                </div>
+            </div>
+            <div class="mb-4">
+                <label for="async-switch" class="block text-sm font-medium text-gray-700">Async</label>
+                <input type="checkbox" id="async-switch" name="asyncSwitch" class="mt-2">
+                <div id="async-notification" class="hidden text-red-500 text-sm mt-2">
+                    Changing this setting requires restarting the simulation.
+                </div>
+            </div>
+            <div class="mb-4">
+                <label for="cell-logs" class="block text-sm font-medium text-gray-700">Bot Logs</label>
+                <textarea id="cell-logs" name="cellLogss" rows="10"
+                    class="w-full mt-2 p-2 border border-gray-300 rounded resize-none overflow-auto"
+                    readonly></textarea>
+            </div>
+            <div class="mb-4">
+                <label for="bot-history" class="block text-sm font-medium text-gray-700">Bot History</label>
+                <textarea id="bot-history" name="botHistory" rows="10"
+                    class="w-full mt-2 p-2 border border-gray-300 rounded resize-none overflow-auto"
+                    readonly></textarea>
+            </div>
+        </div>
+    </div>
+    </div>
+    </div>
+</body>
+
+</html>
