@@ -158,22 +158,11 @@ window.addEventListener("DOMContentLoaded", async () => {
 	// Load levels from ./palyak directory
 	async function loadLevelThumbnails() {
 		try {
-			const urlBase = "./palyak/";
-			// Fetch the directory listing page as a text response
-			const response = await fetch(urlBase);
-			const htmlText = await response.text();
-
-			// Parse the HTML to find .png files
-			const parser = new DOMParser();
-			const doc = parser.parseFromString(htmlText, "text/html");
-
-			// Find all <a> elements and filter for .png links
-			const links = Array.from(doc.querySelectorAll("a"));
-			const pngFiles = links
-				.map((link) => link.getAttribute("href"))
-				.filter((href) => href?.endsWith(".png"));
-
-			const hrefs = pngFiles.map((fileName) => urlBase + fileName);
+			const levelsFileUrl = "./palyak/levels.json";
+			const response = await fetch(levelsFileUrl);
+			const levelsJson = await response.json();
+			const hrefs = levelsJson.levels;	
+			console.log(hrefs);
 			const thumbnails = document.getElementById("level-thumbnails");
 			thumbnails.innerHTML = "";
 			for (const href of hrefs) {

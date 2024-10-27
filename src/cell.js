@@ -325,7 +325,7 @@ export class SyncRobotCell extends RobotCell {
 	 */
 	render(ctx, size) {
 		if (this.isSettled) {
-			ctx.fillStyle = "#00FF00"; // Green for settled
+			ctx.fillStyle = "#FFA500"; // Orange for settled
 		} else {
 			ctx.fillStyle = "#0000FF"; // Blue for not settled
 		}

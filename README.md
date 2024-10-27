@@ -8,7 +8,9 @@ This project simulates the uniform dispersion of robots in a grid field. The rob
   - [Table of Contents](#table-of-contents)
   - [Introduction](#introduction)
   - [Installation](#installation)
+    - [Or run the project locally:](#or-run-the-project-locally)
   - [Usage](#usage)
+    - [Create Custom Fields](#create-custom-fields)
   - [Project Structure](#project-structure)
 
 ## Introduction
@@ -69,7 +71,7 @@ Create a pixel image with the following colors to define a custom field configur
 - **Black**: Wall
 - **Red**: Robot spawn point
 
-Put your custom field image in the `./palyak` directory and after reloading the webserver load it using the "Load Level" button.
+Put your custom field image in the `./palyak` directory, add it to the `palyak/levels.json` and after reloading the webserver load it using the "Load Level" button.
 
 Every pixel will be snapped to the nearest valid cell color
 

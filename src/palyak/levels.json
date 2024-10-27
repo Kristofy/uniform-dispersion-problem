@@ -1,0 +1,10 @@
+{
+    "levels": [
+        "./palyak/palya1.png",
+        "./palyak/palya2.png",
+        "./palyak/palya3.png",
+        "./palyak/palya4.png",
+        "./palyak/palya_big.png",
+        "./palyak/test_snap.png"
+    ]
+}
