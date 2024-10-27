@@ -157,11 +157,12 @@ window.addEventListener("DOMContentLoaded", async () => {
 
 	// Load levels from ./palyak directory
 	async function loadLevelThumbnails() {
+		// TODO: this supports external url, add a way to expand this list from the client
 		try {
 			const levelsFileUrl = "./palyak/levels.json";
 			const response = await fetch(levelsFileUrl);
 			const levelsJson = await response.json();
-			const hrefs = levelsJson.levels;	
+			const hrefs = levelsJson.levels;
 			console.log(hrefs);
 			const thumbnails = document.getElementById("level-thumbnails");
 			thumbnails.innerHTML = "";
