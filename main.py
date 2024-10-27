@@ -3,8 +3,6 @@ from dataclasses import dataclass
 from typing import Literal
 import pygame
 import numpy as np
-import time
-import sys
 import random
 import pygame_widgets
 from pygame_widgets.textbox import TextBox
@@ -82,6 +80,8 @@ class Robot:
 
     def move(self):
         if self.is_settled:
+            return
+        if self.position == self.next_position:
             return
         if not self.history or self.history[-1] != self.position:
             self.history.append(self.position)
@@ -217,7 +217,7 @@ class AsyncRobot(Robot):
         else:
             for dir in Point.all_directions():
                 d = v + dir
-                if not self.field.is_wall_or_settled_robot(d) and d != self.history[-1]:
+                if not self.field.is_occupied(d) and d != self.history[-1]:
                     self.primary_direction = dir
                     self.next_position = v + self.primary_direction
                     break
