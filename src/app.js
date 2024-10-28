@@ -95,7 +95,6 @@ function render(ctx, width, height, deltaTime, settings) {
 	t_maxElement.value = algorithm.t_max;
 	t_totalElement.value = algorithm.t_total;
 	mElement.value = algorithm.m;
-	console.log(algorithm.m);
 }
 
 /***********************************
@@ -234,7 +233,7 @@ window.addEventListener("DOMContentLoaded", async () => {
 		// Debounced resize
 		resizeTimeout = setTimeout(() => {
 			resizeCanvas();
-			render(ctx, canvas.width, canvas.height, 0, field, settings);
+			render(ctx, canvas.width, canvas.height, 0, settings);
 		}, 100);
 	});
 

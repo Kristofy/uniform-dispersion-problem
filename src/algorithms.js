@@ -113,9 +113,17 @@ export class FCDFS extends Algorithm {
 			.flat()
 			.filter((cell) => cell instanceof SyncRobotCell && !cell.isSettled);
 
+		// Check if we will move and if so then increment the total steps
+		this.t_total += toUpdate.filter(
+			(cell) => !cell.position.equals(cell.nextPosition),
+		).length;
+
 		for (const cell of toUpdate) {
 			cell.move();
 		}
+
+		// Every non settled cell contributes to the energy
+		this.e_total += toUpdate.length;
 
 		// 4. Calculate the robots next position
 		for (const row of this.field.matrix) {
