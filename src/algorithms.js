@@ -183,6 +183,15 @@ export class AFCDFS extends Algorithm {
 		if (!this.isRunning) return;
 		// Run tick
 
+
+		// check if the simulation is over, if all robots are settled
+		if (this.field.matrix.every((row) => row.every((cell) => cell.isSettled))) {
+			if (this.field.m === 0) {
+				this.field.m = tick;
+			}
+			return;
+		}
+
 		// 1. If we can, then spawn a new robot at the spawn position
 		if (!this.field.isOccupied(this.field.spawn_position)) {
 			this.field.setCell(
@@ -195,13 +204,48 @@ export class AFCDFS extends Algorithm {
 		// We need to precompute the list of robots to update
 		// So we don't update the same robot twice or skip a robot
 
+		/** @type {AsyncRobotCell[]} */
 		const toUpdate = this.field.matrix
 			.flat()
 			.filter((cell) => cell instanceof AsyncRobotCell && !cell.isSettled);
 
+		// Check if we will move and if so then increment the total steps
+		// Technically we could just check if the robot has to move since
+		// the robot will only calclulate a new position if it is active
+		this.t_total += toUpdate.filter(
+			(cell) => cell.isActive && !cell.position.equals(cell.nextPosition),
+		).length;
+
+		// update the maximum steps taken by a robot
+		for (const cell of toUpdate) {
+			if (cell.isActive && !cell.position.equals(cell.nextPosition)) {
+				this.tPerRobot.set(cell, (this.tPerRobot.get(cell) ?? 0) + 1);
+			}
+		}
+
+		this.t_max = this.field.matrix
+			.flat()
+			.filter((cell) => cell instanceof AsyncRobotCell)
+			.map((cell) => this.tPerRobot.get(cell) ?? 0)
+			.reduce((a, b) => Math.max(a, b), 0);
+
 		for (const cell of toUpdate) {
 			cell.move();
 		}
+
+		// Every non settled cell contributes to the energy
+		this.e_total += toUpdate.length;
+
+		// update the maximum energy consumed by a robot
+		for (const cell of toUpdate) {
+			this.ePerRobot.set(cell, (this.ePerRobot.get(cell) ?? 0) + 1);
+		}
+
+		this.e_max = this.field.matrix
+			.flat()
+			.filter((cell) => cell instanceof AsyncRobotCell)
+			.map((cell) => this.ePerRobot.get(cell) ?? 0)
+			.reduce((a, b) => Math.max(a, b), 0);
 
 		// 4. Calculate the robots next position
 		for (const row of this.field.matrix) {
