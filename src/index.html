@@ -51,6 +51,15 @@
                         <button id="set-optimal-spawn-button" class="bg-purple-500 text-white px-4 py-2 rounded">Set
                             Optimal
                             Spawn</button>
+
+                        <!-- Checkbox for: Async Simulation  -->
+                        <div class="mb-4">
+                            <label for="async-switch" class="block text-sm font-medium text-gray-700">Async</label>
+                            <input type="checkbox" id="async-switch" name="asyncSwitch" class="mt-2">
+                            <div id="async-notification" class="hidden text-red-500 text-sm mt-2">
+                                Changing this setting requires restarting the simulation.
+                            </div>
+                        </div>
                     </div>
                 </details>
 
@@ -84,14 +93,7 @@
                 </div>
             </div>
 
-            <!-- Checkbox for: Async Simulation  -->
-            <div class="mb-4">
-                <label for="async-switch" class="block text-sm font-medium text-gray-700">Async</label>
-                <input type="checkbox" id="async-switch" name="asyncSwitch" class="mt-2">
-                <div id="async-notification" class="hidden text-red-500 text-sm mt-2">
-                    Changing this setting requires restarting the simulation.
-                </div>
-            </div>
+
 
             <!-- Statistics -->
             <details class="mb-4">
@@ -135,7 +137,8 @@
                         </div>
 
                         <div class="flex items-center">
-                            <label for="makespan" class="block text-sm font-medium text-gray-700" title="Makespan">M</label>
+                            <label for="makespan" class="block text-sm font-medium text-gray-700"
+                                title="Makespan">M</label>
                         </div>
                         <div>
                             <input type="text" id="makespan" name="makespan" value="0" readonly
