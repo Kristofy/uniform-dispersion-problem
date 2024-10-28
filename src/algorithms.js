@@ -1,6 +1,6 @@
 import { Settings } from "./settings.js";
 import { Field } from "./field.js";
-import { SyncRobotCell, AsyncRobotCell, WallCell } from "./cell.js";
+import { SyncRobotCell, AsyncRobotCell, WallCell, RobotCell } from "./cell.js";
 
 /**
  * Represents an algorithm with settings and field data.
@@ -35,6 +35,12 @@ export class Algorithm {
 		this.e_max = 0;
 		/** @type {number} Makespan - the first timestamp where all robots are settled */
 		this.m = 0;
+
+		/** @type {WeakMap<RobotCell, number>} The energy expanded by certain robots */
+		this.ePerRobot = new WeakMap();
+
+		/** @type {WeakMap<RobotCell, number>} The time taken by certain robots */
+		this.tPerRobot = new WeakMap();
 	}
 
 	/**
@@ -109,6 +115,7 @@ export class FCDFS extends Algorithm {
 		// We need to precompute the list of robots to update
 		// So we don't update the same robot twice or skip a robot
 
+		/** @type {SyncRobotCell[]} */
 		const toUpdate = this.field.matrix
 			.flat()
 			.filter((cell) => cell instanceof SyncRobotCell && !cell.isSettled);
@@ -118,12 +125,35 @@ export class FCDFS extends Algorithm {
 			(cell) => !cell.position.equals(cell.nextPosition),
 		).length;
 
+		// update the maximum steps taken by a robot
+		for (const cell of toUpdate) {
+			if (!cell.position.equals(cell.nextPosition)) {
+				this.tPerRobot.set(cell, (this.tPerRobot.get(cell) ?? 0) + 1);
+			}
+		}
+
+		this.t_max = this.field.matrix
+			.flat()
+			.filter((cell) => cell instanceof SyncRobotCell)
+			.map((cell) => this.tPerRobot.get(cell) ?? 0)
+			.reduce((a, b) => Math.max(a, b), 0);
+
 		for (const cell of toUpdate) {
 			cell.move();
 		}
 
+		for (const cell of toUpdate) {
+			this.ePerRobot.set(cell, (this.ePerRobot.get(cell) ?? 0) + 1);
+		}
+
 		// Every non settled cell contributes to the energy
 		this.e_total += toUpdate.length;
+
+		this.e_max = this.field.matrix
+			.flat()
+			.filter((cell) => cell instanceof SyncRobotCell)
+			.map((cell) => this.ePerRobot.get(cell) ?? 0)
+			.reduce((a, b) => Math.max(a, b), 0);
 
 		// 4. Calculate the robots next position
 		for (const row of this.field.matrix) {
