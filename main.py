@@ -137,7 +137,7 @@ class SyncRobot(Robot):
                 self.field.is_occupied(v.peak_left()) + \
                 self.field.is_occupied(v.peak_right()) == 3:
                 self.is_settled = True
-            elif len(self.history) < 2 or self.history[-2] == self.diag or not self.field.is_occupied(self.diag):
+            elif (len(self.history) >= 2 and self.history[-2] == self.diag) or not self.field.is_occupied(self.diag):
                 self.is_settled = True
             else:
                 for dir in Point.all_directions():
