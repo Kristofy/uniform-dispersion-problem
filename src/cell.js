@@ -275,8 +275,8 @@ export class SyncRobotCell extends RobotCell {
 		// Right now we are either in a corner with 2 walls blocking, or in a hall
 		// check if this is a corner proof: https://arxiv.org/pdf/2404.19564
 		if (
-			this.history.length < 2 ||
-			this.history[this.history.length - 2].equals(this.diag) ||
+			(this.history.length >= 2 &&
+				this.history[this.history.length - 2].equals(this.diag)) ||
 			!this.field.isOccupied(this.diag)
 		) {
 			this.isSettled = true;
