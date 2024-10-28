@@ -3,6 +3,7 @@ import { Field } from "./field.js";
 import { FCDFS, AFCDFS, Algorithm } from "./algorithms.js";
 import { Vector2 } from "./vector.js";
 import { EmptyCell, RobotCell, SyncRobotCell, WallCell } from "./cell.js";
+import { geometricMean } from "./graph.js";
 
 /********************
  * Main Render Loop *
@@ -10,6 +11,12 @@ import { EmptyCell, RobotCell, SyncRobotCell, WallCell } from "./cell.js";
 
 /** @type {Algorithm | null} */
 let algorithm = null;
+
+let e_maxElement = null;
+let e_totalElement = null;
+let t_maxElement = null;
+let t_totalElement = null;
+let mElement = null;
 
 /**
  * Set up the simulation.
@@ -32,6 +39,13 @@ async function setup(settings) {
 	window.algorithm = algorithm;
 
 	document.getElementById("async-notification").classList.add("hidden");
+
+	// Set up the stats
+	e_maxElement = document.getElementById("e-max");
+	e_totalElement = document.getElementById("e-total");
+	t_maxElement = document.getElementById("t-max");
+	t_totalElement = document.getElementById("t-total");
+	mElement = document.getElementById("makespan");
 }
 
 let accumulatedTime = 0;
@@ -48,6 +62,7 @@ function render(ctx, width, height, deltaTime, settings) {
 	/** @type {Field} field - the current field */
 	const field = algorithm.field;
 
+	// Make the cells square, and center the field
 	const cellWidth = width / field.cols;
 	const cellHeight = height / field.rows;
 	const cellSize = Math.min(cellWidth, cellHeight);
@@ -63,14 +78,24 @@ function render(ctx, width, height, deltaTime, settings) {
 	ctx.save();
 	ctx.translate(offsetX, offsetY);
 
+	// Update the simulation
 	while (accumulatedTime > settings.simulationSpeed) {
 		accumulatedTime -= settings.simulationSpeed;
 		algorithm.tick();
 	}
 
+	// Update canvas
 	field.render(ctx, fieldWidth, fieldHeight);
 
 	ctx.restore();
+
+	// Update the stats
+	e_maxElement.value = algorithm.e_max;
+	e_totalElement.value = algorithm.e_total;
+	t_maxElement.value = algorithm.t_max;
+	t_totalElement.value = algorithm.t_total;
+	mElement.value = algorithm.m;
+	console.log(algorithm.m);
 }
 
 /***********************************
@@ -153,6 +178,20 @@ window.addEventListener("DOMContentLoaded", async () => {
 		.getElementById("close-modal-button")
 		.addEventListener("click", () => {
 			document.getElementById("level-selector-modal").classList.add("hidden");
+		});
+
+	document
+		.getElementById("set-optimal-spawn-button")
+		.addEventListener("click", () => {
+			const field = algorithm.field;
+			const isWall = field.matrix.map((row) =>
+				row.map((cell) => cell instanceof WallCell),
+			);
+
+			const point = geometricMean(isWall);
+			console.log(point);
+
+			field.spawn_position = new Vector2(point.x, point.y);
 		});
 
 	// Load levels from ./palyak directory

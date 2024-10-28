@@ -21,24 +21,38 @@
         <!-- Settings Menu -->
         <div class="bg-white p-4 shadow-lg md:w-1/4 w-full md:h-full h-auto">
             <h2 class="text-xl font-bold mb-4">Settings</h2>
+
+            <!-- Slider for: Probability value for async simulation  -->
             <div class="mb-4">
                 <label for="p-slider" class="block text-sm font-medium text-gray-700">P(Active)</label>
                 <input type="range" id="p-slider" name="p-slider" min="0.01" max="1" value="0.5" step="0.01"
                     class="w-full mt-2">
             </div>
+
+            <!-- Slider for: Simulation Speed (seconds per tick) -->
             <div class="mb-4">
                 <label for="speed-slider" class="block text-sm font-medium text-gray-700">Simulation Speed (seconds per
                     tick)</label>
                 <input type="range" id="speed-slider" name="speedSlider" min="0.01" max="2" step="0.01" value="1"
                     class="w-full mt-2">
             </div>
+
+            <!-- Action buttons -->
             <div class="mb-4">
-                <div class="flex flex-wrap gap-2">
-                    <button id="start-pause-button" class="bg-blue-500 text-white px-4 py-2 rounded">Start</button>
-                    <button id="reset-button" class="bg-red-500 text-white px-4 py-2 rounded">Restart</button>
-                    <button id="level-selector-button" class="bg-green-500 text-white px-4 py-2 rounded">Select
-                        Level</button>
-                </div>
+
+                <!-- Buttons -->
+                <details class="mb-4">
+                    <summary class="bg-gray-500 text-white px-4 py-2 rounded cursor-pointer">Actions</summary>
+                    <div class="flex flex-wrap gap-2 mt-4">
+                        <button id="start-pause-button" class="bg-blue-500 text-white px-4 py-2 rounded">Start</button>
+                        <button id="reset-button" class="bg-red-500 text-white px-4 py-2 rounded">Restart</button>
+                        <button id="level-selector-button" class="bg-green-500 text-white px-4 py-2 rounded">Select
+                            Level</button>
+                        <button id="set-optimal-spawn-button" class="bg-purple-500 text-white px-4 py-2 rounded">Set
+                            Optimal
+                            Spawn</button>
+                    </div>
+                </details>
 
                 <!-- Level Selector Modal -->
                 <div id="level-selector-modal"
@@ -69,6 +83,8 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Checkbox for: Async Simulation  -->
             <div class="mb-4">
                 <label for="async-switch" class="block text-sm font-medium text-gray-700">Async</label>
                 <input type="checkbox" id="async-switch" name="asyncSwitch" class="mt-2">
@@ -76,21 +92,80 @@
                     Changing this setting requires restarting the simulation.
                 </div>
             </div>
-            <div class="mb-4">
-                <label for="cell-logs" class="block text-sm font-medium text-gray-700">Bot Logs</label>
-                <textarea id="cell-logs" name="cellLogss" rows="10"
-                    class="w-full mt-2 p-2 border border-gray-300 rounded resize-none overflow-auto"
-                    readonly></textarea>
-            </div>
-            <div class="mb-4">
-                <label for="bot-history" class="block text-sm font-medium text-gray-700">Bot History</label>
-                <textarea id="bot-history" name="botHistory" rows="10"
-                    class="w-full mt-2 p-2 border border-gray-300 rounded resize-none overflow-auto"
-                    readonly></textarea>
-            </div>
+
+            <!-- Statistics -->
+            <details class="mb-4">
+                <summary class="bg-gray-500 text-white px-4 py-2 rounded cursor-pointer">Statistics</summary>
+                <div class="mt-4">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="flex items-center">
+                            <label for="t-max" class="block text-sm font-medium text-gray-700"
+                                title="Maximum distance">T<sub>max</sub></label>
+                        </div>
+                        <div>
+                            <input type="text" id="t-max" name="tMax" value="0" readonly
+                                class="w-full p-2 border border-gray-300 rounded bg-gray-100">
+                        </div>
+
+                        <div class="flex items-center">
+                            <label for="t-total" class="block text-sm font-medium text-gray-700"
+                                title="Total distance">T<sub>total</sub></label>
+                        </div>
+                        <div>
+                            <input type="text" id="t-total" name="tTotal" value="0" readonly
+                                class="w-full p-2 border border-gray-300 rounded bg-gray-100">
+                        </div>
+
+                        <div class="flex items-center">
+                            <label for="e-max" class="block text-sm font-medium text-gray-700"
+                                title="Maximum Energy">E<sub>max</sub></label>
+                        </div>
+                        <div>
+                            <input type="text" id="e-max" name="eMax" value="0" readonly
+                                class="w-full p-2 border border-gray-300 rounded bg-gray-100">
+                        </div>
+
+                        <div class="flex items-center">
+                            <label for="e-total" class="block text-sm font-medium text-gray-700"
+                                title="Total Energy">E<sub>total</sub></label>
+                        </div>
+                        <div>
+                            <input type="text" id="e-total" name="eTotal" value="0" readonly
+                                class="w-full p-2 border border-gray-300 rounded bg-gray-100">
+                        </div>
+
+                        <div class="flex items-center">
+                            <label for="makespan" class="block text-sm font-medium text-gray-700" title="Makespan">M</label>
+                        </div>
+                        <div>
+                            <input type="text" id="makespan" name="makespan" value="0" readonly
+                                class="w-full p-2 border border-gray-300 rounded bg-gray-100">
+                        </div>
+                    </div>
+                </div>
+            </details>
+
+            <!-- Bot logs -->
+            <details class="mb-4">
+                <summary class="bg-gray-500 text-white px-4 py-2 rounded cursor-pointer">Bot Logs</summary>
+                <div class="mt-4">
+                    <label for="cell-logs" class="block text-sm font-medium text-gray-700">Bot Logs</label>
+                    <textarea id="cell-logs" name="cellLogs" rows="10"
+                        class="w-full mt-2 p-2 border border-gray-300 rounded resize-none overflow-auto"
+                        readonly></textarea>
+                </div>
+            </details>
+
+            <details class="mb-4">
+                <summary class="bg-gray-500 text-white px-4 py-2 rounded cursor-pointer">Bot History</summary>
+                <div class="mt-4">
+                    <label for="bot-history" class="block text-sm font-medium text-gray-700">Bot History</label>
+                    <textarea id="bot-history" name="botHistory" rows="10"
+                        class="w-full mt-2 p-2 border border-gray-300 rounded resize-none overflow-auto"
+                        readonly></textarea>
+                </div>
+            </details>
         </div>
-    </div>
-    </div>
     </div>
 </body>
 

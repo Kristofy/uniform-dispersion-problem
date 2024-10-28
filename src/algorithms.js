@@ -1,6 +1,6 @@
 import { Settings } from "./settings.js";
 import { Field } from "./field.js";
-import { SyncRobotCell, AsyncRobotCell } from "./cell.js";
+import { SyncRobotCell, AsyncRobotCell, WallCell } from "./cell.js";
 
 /**
  * Represents an algorithm with settings and field data.
@@ -24,6 +24,17 @@ export class Algorithm {
 
 		/** @type {number} tickCount */
 		this.tickCount = 0;
+
+		/** @type {number} - total steps taken of every robot */
+		this.t_total = 0;
+		/** @type {number} - maximum steps taken by a robot */
+		this.t_max = 0;
+		/** @type {number} - total energy consumed by every robot */
+		this.e_total = 0;
+		/** @type {number} - maximum energy consumed by a robot */
+		this.e_max = 0;
+		/** @type {number} Makespan - the first timestamp where all robots are settled */
+		this.m = 0;
 	}
 
 	/**
@@ -67,6 +78,24 @@ export class FCDFS extends Algorithm {
 	tick() {
 		if (!this.isRunning) return;
 		// Run tick
+
+		// Check if we are done
+		if (
+			this.field.matrix.every((row) =>
+				row.every(
+					(cell) =>
+						(cell instanceof SyncRobotCell && cell.isSettled) ||
+						cell instanceof WallCell,
+				),
+			)
+		) {
+			if (this.m === 0) {
+				this.m = this.tickCount;
+				console.log("Makespan", this.m);
+			}
+
+			return;
+		}
 
 		// 1. If we can, then spawn a new robot at the spawn position
 		if (!this.field.isOccupied(this.field.spawn_position)) {
