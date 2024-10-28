@@ -87,13 +87,13 @@ export class FCDFS extends Algorithm {
 
 		// Check if we are done
 		if (
-			this.field.matrix.every((row) =>
-				row.every(
+			this.field.matrix
+				.flat()
+				.every(
 					(cell) =>
 						(cell instanceof SyncRobotCell && cell.isSettled) ||
 						cell instanceof WallCell,
-				),
-			)
+				)
 		) {
 			if (this.m === 0) {
 				this.m = this.tickCount;
@@ -102,6 +102,7 @@ export class FCDFS extends Algorithm {
 
 			return;
 		}
+		this.m = this.tickCount;
 
 		// 1. If we can, then spawn a new robot at the spawn position
 		if (!this.field.isOccupied(this.field.spawn_position)) {
@@ -184,12 +185,21 @@ export class AFCDFS extends Algorithm {
 		// Run tick
 
 		// check if the simulation is over, if all robots are settled
-		if (this.field.matrix.every((row) => row.every((cell) => cell.isSettled))) {
-			if (this.field.m === 0) {
-				this.field.m = tick;
+		if (
+			this.field.matrix
+				.flat()
+				.every(
+					(cell) =>
+						(cell instanceof AsyncRobotCell && cell.isSettled) ||
+						cell instanceof WallCell,
+				)
+		) {
+			if (this.m === 0) {
+				this.m = this.tickCount;
 			}
 			return;
 		}
+		this.m = this.tickCount;
 
 		// 1. If we can, then spawn a new robot at the spawn position
 		if (!this.field.isOccupied(this.field.spawn_position)) {
