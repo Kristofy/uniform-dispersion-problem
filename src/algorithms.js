@@ -183,7 +183,6 @@ export class AFCDFS extends Algorithm {
 		if (!this.isRunning) return;
 		// Run tick
 
-
 		// check if the simulation is over, if all robots are settled
 		if (this.field.matrix.every((row) => row.every((cell) => cell.isSettled))) {
 			if (this.field.m === 0) {
@@ -210,15 +209,11 @@ export class AFCDFS extends Algorithm {
 			.filter((cell) => cell instanceof AsyncRobotCell && !cell.isSettled);
 
 		// Check if we will move and if so then increment the total steps
-		// Technically we could just check if the robot has to move since
-		// the robot will only calclulate a new position if it is active
-		this.t_total += toUpdate.filter(
-			(cell) => cell.isActive && !cell.position.equals(cell.nextPosition),
-		).length;
+		this.t_total += toUpdate.filter((cell) => cell.isActive).length;
 
 		// update the maximum steps taken by a robot
 		for (const cell of toUpdate) {
-			if (cell.isActive && !cell.position.equals(cell.nextPosition)) {
+			if (cell.isActive) {
 				this.tPerRobot.set(cell, (this.tPerRobot.get(cell) ?? 0) + 1);
 			}
 		}
