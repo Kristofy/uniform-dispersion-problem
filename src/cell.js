@@ -161,6 +161,15 @@ export class RobotCell extends CellBase {
 	}
 
 	/**
+	 * Returns true if the robot would move if asked to move.
+	 * This means that the robot is not settled and the next position is not the same as the current position.
+	 * @returns {boolean} True if the robot would move if asked to.
+	 */
+	wouldMove() {
+		return !this.isSettled && !this.nextPosition.equals(this.position);
+	}
+
+	/**
 	 * Renders the cell.
 	 * This method must be implemented by subclasses.
 	 * @abstract
@@ -523,7 +532,7 @@ export class AsyncRobotCell extends RobotCell {
 			}
 
 			// If we can move in this direction, we set it as the primary direction
-			if (!this.field.isOccupied(looking)) {
+			if (!this.field.isOccupied(looking) && !this.isBroadcastingRobot(looking)) {
 				this.primaryDirection = dir;
 				this.logs.push(
 					`Tick ${tick}: Changing primary direction to: ${dir.toString()}`,

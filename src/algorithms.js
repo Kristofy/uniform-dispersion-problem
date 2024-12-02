@@ -70,6 +70,19 @@ export class Algorithm {
 	toggle() {
 		this.isRunning = !this.isRunning;
 	}
+
+	/**
+	 * Has the algorithm completed.
+	 */
+	isDone() {
+		return this.field.matrix
+			.flat()
+			.every(
+				(cell) =>
+					(cell instanceof RobotCell && cell.isSettled) ||
+					cell instanceof WallCell,
+			);
+	}
 }
 
 /**
@@ -96,21 +109,13 @@ export class FCDFS extends Algorithm {
 				)
 		) {
 			if (this.m === 0) {
-				this.m = this.tickCount;
+				this.m = this.tickCount + 2; // non zero index + last tick
 				console.log("Makespan", this.m);
 			}
 
 			return;
 		}
-		this.m = this.tickCount;
-
-		// 1. If we can, then spawn a new robot at the spawn position
-		if (!this.field.isOccupied(this.field.spawn_position)) {
-			this.field.setCell(
-				this.field.spawn_position,
-				new SyncRobotCell(this.field.spawn_position, this.field),
-			);
-		}
+		this.m = this.tickCount + 1; // non zero index
 
 		// 2. Move the robot to the next position
 		// We need to precompute the list of robots to update
@@ -166,6 +171,14 @@ export class FCDFS extends Algorithm {
 			}
 		}
 
+		// 1. If we can, then spawn a new robot at the spawn position
+		if (!this.field.isOccupied(this.field.spawn_position)) {
+			this.field.setCell(
+				this.field.spawn_position,
+				new SyncRobotCell(this.field.spawn_position, this.field),
+			);
+		}
+
 		// OUTSIDE: Render the state
 		this.tickCount++;
 	}
@@ -195,19 +208,11 @@ export class AFCDFS extends Algorithm {
 				)
 		) {
 			if (this.m === 0) {
-				this.m = this.tickCount;
+				this.m = this.tickCount + 2; // non zero index + last tick
 			}
 			return;
 		}
-		this.m = this.tickCount;
-
-		// 1. If we can, then spawn a new robot at the spawn position
-		if (!this.field.isOccupied(this.field.spawn_position)) {
-			this.field.setCell(
-				this.field.spawn_position,
-				new AsyncRobotCell(this.field.spawn_position, this.field),
-			);
-		}
+		this.m = this.tickCount + 1; // non zero index
 
 		// 2. Move the robot to the next position
 		// We need to precompute the list of robots to update
@@ -219,11 +224,11 @@ export class AFCDFS extends Algorithm {
 			.filter((cell) => cell instanceof AsyncRobotCell && !cell.isSettled);
 
 		// Check if we will move and if so then increment the total steps
-		this.t_total += toUpdate.filter((cell) => cell.isActive).length;
+		this.t_total += toUpdate.filter((cell) => cell.wouldMove()).length;
 
 		// update the maximum steps taken by a robot
 		for (const cell of toUpdate) {
-			if (cell.isActive) {
+			if (cell.isActive && cell.wouldMove()) {
 				this.tPerRobot.set(cell, (this.tPerRobot.get(cell) ?? 0) + 1);
 			}
 		}
@@ -235,15 +240,28 @@ export class AFCDFS extends Algorithm {
 			.reduce((a, b) => Math.max(a, b), 0);
 
 		for (const cell of toUpdate) {
-			cell.move();
+			if (cell.isActive) {
+				cell.move();
+			}
 		}
 
-		// Every non settled cell contributes to the energy
-		this.e_total += toUpdate.length;
+		for (const row of this.field.matrix) {
+			for (const cell of row) {
+				if (cell instanceof AsyncRobotCell) {
+					if (cell.isSettled) continue;
+					// Here the the robot becomes active with probability p
+					cell.isActive = Math.random() < this.settings.p;
+					cell.update(this.tickCount);
 
-		// update the maximum energy consumed by a robot
-		for (const cell of toUpdate) {
-			this.ePerRobot.set(cell, (this.ePerRobot.get(cell) ?? 0) + 1);
+					// update the maximum energy consumed by a robot
+					if (cell.isActive) {
+						this.ePerRobot.set(cell, (this.ePerRobot.get(cell) ?? 0) + 1);
+					}
+					// if (cell.isActive) {
+					this.e_total += 1;
+					// }
+				}
+			}
 		}
 
 		this.e_max = this.field.matrix
@@ -252,16 +270,19 @@ export class AFCDFS extends Algorithm {
 			.map((cell) => this.ePerRobot.get(cell) ?? 0)
 			.reduce((a, b) => Math.max(a, b), 0);
 
-		// 4. Calculate the robots next position
-		for (const row of this.field.matrix) {
-			for (const cell of row) {
-				if (cell instanceof AsyncRobotCell) {
-					if (cell.isSettled) continue;
-					// Here the the robot becomes active with probability p
-					cell.isActive = Math.random() < this.settings.p;
-					cell.update(this.tickCount);
-				}
-			}
+		// this.e_total = this.field.matrix
+		// 	.flat()
+		// 	.filter((cell) => cell instanceof AsyncRobotCell)
+		// 	.map((cell) => this.ePerRobot.get(cell) ?? 0)
+		// 	.reduce((a, b) => a + b, 0);
+
+		// 1. If we can, then spawn a new robot at the spawn position
+		if (!this.field.isOccupied(this.field.spawn_position)) {
+			const newRobot = new AsyncRobotCell(
+				this.field.spawn_position,
+				this.field,
+			);
+			this.field.setCell(this.field.spawn_position, newRobot);
 		}
 
 		// OUTSIDE: Render the state
