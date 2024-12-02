@@ -254,12 +254,7 @@ export class AFCDFS extends Algorithm {
 					cell.update(this.tickCount);
 
 					// update the maximum energy consumed by a robot
-					if (cell.isActive) {
-						this.ePerRobot.set(cell, (this.ePerRobot.get(cell) ?? 0) + 1);
-					}
-					// if (cell.isActive) {
-					this.e_total += 1;
-					// }
+					this.ePerRobot.set(cell, (this.ePerRobot.get(cell) ?? 0) + 1);
 				}
 			}
 		}
@@ -270,11 +265,11 @@ export class AFCDFS extends Algorithm {
 			.map((cell) => this.ePerRobot.get(cell) ?? 0)
 			.reduce((a, b) => Math.max(a, b), 0);
 
-		// this.e_total = this.field.matrix
-		// 	.flat()
-		// 	.filter((cell) => cell instanceof AsyncRobotCell)
-		// 	.map((cell) => this.ePerRobot.get(cell) ?? 0)
-		// 	.reduce((a, b) => a + b, 0);
+		this.e_total = this.field.matrix
+			.flat()
+			.filter((cell) => cell instanceof AsyncRobotCell)
+			.map((cell) => this.ePerRobot.get(cell) ?? 0)
+			.reduce((a, b) => a + b, 0);
 
 		// 1. If we can, then spawn a new robot at the spawn position
 		if (!this.field.isOccupied(this.field.spawn_position)) {
