@@ -1,3 +1,6 @@
+# Project description
+This project is created for our masters course "Computer networks and distibuted systems" at ELTE, this is a Student Project, that is an implementation of the following paper: [Time, Travel, and Energy in the Uniform Dispersion Problem by Michael Amir, Alfred M. Bruckstein](https://arxiv.org/pdf/2404.19564)
+
 # Uniform Dispersion Problem
 
 This project simulates the uniform dispersion of robots in a grid field. The robots navigate through the field, avoiding obstacles and ensuring even distribution.
