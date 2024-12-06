@@ -12,30 +12,20 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # Cache Pandoc installation
-      - name: Cache Pandoc
-        uses: actions/cache@v3
+      - uses: actions/checkout@v2
+      - uses: awalsh128/cache-apt-pkgs-action@latest
         with:
-          path: /usr/local/bin/pandoc
-          key: pandoc-cache-v2
-          restore-keys: pandoc-cache-v2
-
-      # Install Pandoc if not already cached
-      - name: Install Pandoc if needed
-        if: !steps.cache.outputs.cache-hit
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y pandoc texlive-latex-base
+          packages: pandoc texlive-base texlive-fonts-recommended
+          version: 1.0
 
       # Convert Markdown to PDF
       - name: Convert Markdown to PDF
         run: |
-          mkdir -p output
-          pandoc docs/report.md -o output/report.pdf
+          pandoc docs/riport.md --from gfm --to pdf --output docs/riport.pdf --self-contained --resource-path docs
 
       # Upload the PDF as an artifact
       - name: Upload PDF artifact
         uses: actions/upload-artifact@v3
         with:
-          name: report-pdf
-          path: output/report.pdf
+          name: riport
+          path: docs/riport.pdf
