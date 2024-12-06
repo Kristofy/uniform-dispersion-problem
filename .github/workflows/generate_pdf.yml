@@ -20,7 +20,7 @@ jobs:
       # Convert Markdown to PDF
       - name: Convert Markdown to PDF
         run: |
-          pandoc docs/riport.md --from gfm --to pdf --output docs/riport.pdf --self-contained --resource-path docs
+          pandoc --citeproc --bibliography=docs/references.bib --to pdf --output docs/riport.pdf --embed-resources --standalone --resource-path=docs docs/riport.md --csl=docs/ieee.csl
 
       # Upload the PDF as an artifact
       - name: Upload PDF artifact

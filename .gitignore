@@ -1,2 +1,3 @@
 .mypy_cache
+docs/riport.pdf
 .venv

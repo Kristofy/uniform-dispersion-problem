@@ -21,13 +21,13 @@ Az algoritmus menete a következő minden robotra végrehajtva:
   - Különben egy kanyarban állunk, ahol nem állhatunk meg, keressünk egy olyan irányt amerre áttállítjuk az elsődleges irányt és lépünk, ez az irány nem lehet ugyan az mint amelyik irányból ide léptünk
     - A kanyarba beleléptünk az egyik irányból ami szabad, és továbbmegyünk a másik irányba ami szabad
 
-#### Lehetséges sarkok
+### Lehetséges sarkok
 
 ![Figure 2](./images/fig2.png)
 
-### Megjegyzések
+## Megjegyzések
 
-#### Diagonális elem
+### Diagonális elem
 
 ![Figure 3](./images/fig3.png)
 
@@ -46,4 +46,16 @@ A pályára mint gráfra tekintve, ahol a szabad cellák között a manhattan t�
 Ha feltesszük hogy nem elvágópont egy kanyar, akkor létezik két út is a sarok melletti pontokhoz, ahonnan kapcsolódhatnak a tér többi részéhez, hiszen az indirekt feltételünk szereint sarok pont nem elvágópont, így ha az levágjuk még mindig összefüggő marad a gráf. Igy viszont a kanyar két ága összekapcsolódik valahol máshol is mint a sarok elemen, ezzel körbevével vagy a diagonális elemet vagy a diagonálissal szembeni sarkot.
 Ez viszont ellentmond az eredeti feltételünknek hogy a tér egyszerűen összekapcsolt, hiszen akkor a falakból és megállt robotokból álló rész nem alkot összefüggő gráfot, hiszen a diagonális elemet nem lehet összekötni a sarok elemekkel, ahogy ez látszik az illusztrációban is.
 
+A formális bizonyítás olvasható az eredei cikkben [@amir2024time].
+
 ![Figure 6](./images/fig6.png)
+
+## AFCDFS
+
+Az [fcdfs](#fcdfs) algoritmus asyncorn változata, ahol a valóságot jobban közelíttő módon, a robotok nem egyszerre lépnek, hanem egymástól "függetlenül" tudnak lépni. A szimulációban ez az jelenti, hogy egy körben egy adott robotnak p valószínűséggel tud majd lépni.
+
+A szinkronizált lépések hordoztak magukkal információt, amit itt nem tudunk kihasználni, ezért itt 1 bit kommunikációra szükségünk van körönként, ez segítteni fog megkülönböztetni a megállt és a még aktív robotokat.
+
+Az algoritmus menete ugyan az mint a [szinkron esetben](#algoritmus), de itt nem csak azt vizsgáljuk majd hogy egy mező foglalt e, hanem azt is hogy éppen aktív robot foglalja e a mezőt, ez nem fordulhatott elő az alapfeladatban, hiszen ott mindenki egyszerre lét, 2 körönként jelennek meg új robotok, és minden robot optimális úton halad a végcélja felé. Itt viszont habár továbbra is optimális úton haladnak a robotok a végcéljukhoz, de így is kerülhetnek közvetlen egymás mellé, ebben az esetben a hátrább lévő robot abban a körben nem csinál semmit, várakozik ameddig az előtte lévő robot elmozdul, vagy letelepedig és inaktívvá válik.
+
+# References
