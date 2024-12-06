@@ -1,0 +1,41 @@
+name: Convert Markdown to PDF
+
+on:
+  workflow_dispatch: # Allows manual triggering
+
+jobs:
+  generate-pdf:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout the repository to access the markdown file
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # Cache Pandoc installation
+      - name: Cache Pandoc
+        uses: actions/cache@v3
+        with:
+          path: /usr/local/bin/pandoc
+          key: pandoc-cache-v2
+          restore-keys: pandoc-cache-v2
+
+      # Install Pandoc if not already cached
+      - name: Install Pandoc if needed
+        if: !steps.cache.outputs.cache-hit
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y pandoc texlive-latex-base
+
+      # Convert Markdown to PDF
+      - name: Convert Markdown to PDF
+        run: |
+          mkdir -p output
+          pandoc docs/report.md -o output/report.pdf
+
+      # Upload the PDF as an artifact
+      - name: Upload PDF artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: report-pdf
+          path: output/report.pdf
