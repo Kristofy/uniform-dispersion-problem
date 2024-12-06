@@ -15,7 +15,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: awalsh128/cache-apt-pkgs-action@latest
         with:
-          packages: pandoc texlive-base texlive-fonts-recommended
+          packages: pandoc texlive-latex-recommended texlive-fonts-recommended
           version: 1.0
 
       # Convert Markdown to PDF
