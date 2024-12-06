@@ -34,7 +34,8 @@ Az algoritmus menete a következő minden robotra végrehajtva:
 Egy sarokban állva (ahol két diagonálisan egymás melleti elem blokkol) a diagonális elem az a sarok pontjaitól 3 manhattan távolságra lévő elem ami a sarokban állótól 2 manhattan távolságra van.
 
 **Formálisan:** Legyen h = (hx, hy) egy robot pozíciója, és $p_i = (px_i, py_i), i \in \{0, 1, 2, 3, 4\}$ a h -val szomszédos blokkoló elemek halmaza és hn az ilyen elemek száma.
-$$ diag(h) = \sum\_{i = 1}^{hn} (hx - px_i, hy - py_i) $$
+
+$$diag(h) = \sum\_{i = 1}^{hn} (hx - px_i, hy - py_i)$$
 
 #### A kanyarok sarokpontjai elvágó pontok
 
