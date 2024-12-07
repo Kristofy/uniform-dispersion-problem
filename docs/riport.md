@@ -72,7 +72,7 @@ Az energia és idő optimalitásra, azt tudjuk mondani hogy asszimptotikusan opt
 
 **Formálisan:** Legyen $\alpha = \frac{1}{2}(1 - \sqrt{1 - p})$, ahol p az AFCDFS paramétere, ekkor
 
-$$\Mu \leq \left(\frac{1}{\alpha} + o(1)\right) n$$
+$$M \leq \left(\frac{1}{\alpha} + o(1)\right) n$$
 $$E_{max} \leq 2\left(1 + \alpha + o(1)\right) \max_{v \in R} dist(s, v)$$
 
 Feltételek $n \to \infty$ esetén nagy valószínűséggel teljesülnek, ahogy $n \to \infty$ úgy a valószínűség tart 1-hez.
