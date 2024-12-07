@@ -5,7 +5,7 @@ on:
 
 jobs:
   generate-pdf:
-    runs-on: ubuntu:24.04
+    runs-on: ubuntu-latest
 
     steps:
       # Checkout the repository to access the markdown file
@@ -14,8 +14,10 @@ jobs:
 
       - name: Install pandoc
         run: |
+          wget -O /tmp/pandoc.deb https://github.com/jgm/pandoc/releases/download/3.5/pandoc-3.5-1-amd64.deb
+          sudo dpkg -i /tmp/pandoc.deb
           sudo apt-get update
-          sudo apt-get install -y pandoc texlive-latex-recommended texlive-fonts-recommended pandoc-citeproc
+          sudo apt-get install -y texlive-latex-recommended texlive-fonts-recommended pandoc-citeproc
 
       # Convert Markdown to PDF
       - name: Convert Markdown to PDF
