@@ -15,12 +15,12 @@ jobs:
       - name: Install pandoc
         run: |
           sudo apt-get update
-          sudo apt-get install -y pandoc texlive-latex-recommended texlive-fonts-recommended
+          sudo apt-get install -y pandoc texlive-latex-recommended texlive-fonts-recommended pandoc-citeproc
 
       # Convert Markdown to PDF
       - name: Convert Markdown to PDF
         run: |
-          pandoc --citeproc --bibliography=docs/references.bib --to pdf --output docs/riport.pdf --embed-resources --standalone --resource-path=docs docs/riport.md --csl=docs/ieee.csl
+          pandoc --citeproc --bibliography=docs/references.bib --to pdf --output docs/riport.pdf --standalone --resource-path=docs docs/riport.md --csl=docs/ieee.csl
 
       # Upload the PDF as an artifact
       - name: Upload PDF artifact
