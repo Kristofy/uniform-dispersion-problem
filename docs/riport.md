@@ -180,4 +180,30 @@ A következő fontos megállapítások szűrhetők le az eredményekből:
 
 [^1]: Az energiaoptimalitás megoldása általános esetben nem lehetséges konstans látótávolság mellett.
 
+# Összefoglalás
+
+Az FCDFS és AFCDFS algoritmusok részletes elemzése és összehasonlítása alapján megállapítható, hogy mindkét megközelítés kiemelkedően jól teljesít a robotok egyenletes szórásának problémájában, különböző egyszeresen összekapcsolt környezetekben. Az FCDFS algoritmus minden vizsgált metrika alapján optimális, így szinkron környezetben ideális választás, például, amikor a feladatot megoldhatjuk előre, és nem valós időben kell megoldanunk a szétszórás problémáját. Az AFCDFS algoritmus, amely az aszinkron működési modellekhez alkalmazkodik, szintén hatékonyan közelíti az optimális eredményeket, különösen az energiafogyasztás szempontjából.
+
+A két algoritmus kifejezetten egyszerű fizikai képességekkel rendelkező robotok számára készült, amely egy nagy előnyt, hiszen a feltérképezni kívánt területtel arányos, tehát nagy mennyiségű robotra van szükség.
+
+# Jövőbeli munkák
+
+Az algoritmusok további fejlesztése és alkalmazási lehetőségeinek vizsgálata számos érdekes irányt kínál:
+
+**Különböző topológiák elemzése:**  
+A bemutatott algoritmusok viselkedésének tanulmányozása összetettebb, nem egyszerűen összekapcsolt környezetekben, például akadályokkal teli vagy dinamikusan változó tereken.
+
+**Továbbfejlesztett aszinkron modellek:**  
+Az AFCDFS algoritmus továbbfejlesztése olyan forgatókönyvekhez, ahol az aszinkron működés erősen szabálytalan, és a robotok kommunikációs képességei korlátozottabbak.
+
+**Energiahatékonyság további optimalizálása:**
+Olyan stratégiák kidolgozása, amelyek az energiafogyasztást nemcsak aszimptotikusan, hanem kisebb méretű környezetekben is minimalizálják.
+
+**Hardvermegvalósítás és valós környezeti tesztek:**  
+Az algoritmusok fizikai robotplatformokra történő implementálása és valós környezetekben való tesztelése, beleértve a robotok szenzorainak és aktuátorainak korlátait is. Ezen felük az algoritmus hibakezelő képességekkel való kiegészítése.
+
+Ezek az irányok nemcsak a jelenlegi algoritmusok továbbfejlesztésére adnak lehetőséget, hanem hozzájárulhatnak az autonóm rajrobotikai rendszerek szélesebb körű alkalmazhatóságához, különösen dinamikusan változó és bizonytalan környezetekben.
+
+\newpage
+
 # References
