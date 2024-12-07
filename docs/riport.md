@@ -2,7 +2,7 @@
 
 Az algoritmus lényege az egyszerűen összepcsolt tulajdonság fenntartása, azzal, hogy csak olyan sarkokban állnak majd meg robotok ahol garantáltan nem váják több részre a teret.
 
-![Figure 5](./images/fig5.png)
+![Figure 5](./images/fig5.png){ width=90% } \
 
 Egy ilyen módszer a környezet aktívan módosítja ezzel indirekt információt áttadval a robotok között.
 
@@ -23,13 +23,13 @@ Az algoritmus menete a következő minden robotra végrehajtva:
 
 ### Lehetséges sarkok
 
-![Figure 2](./images/fig2.png)
+![Figure 2](./images/fig2.png){ width=90% } \
 
 ## Megjegyzések
 
 ### Diagonális elem
 
-![Figure 3](./images/fig3.png)
+![Figure 3](./images/fig3.png){ width=40% } \
 
 Egy sarokban állva (ahol két diagonálisan egymás melleti elem blokkol) a diagonális elem az a sarok pontjaitól 3 manhattan távolságra lévő elem ami a sarokban állótól 2 manhattan távolságra van.
 
@@ -48,7 +48,7 @@ Ez viszont ellentmond az eredeti feltételünknek hogy a tér egyszerűen össze
 
 A formális bizonyítás olvasható az eredei cikkben [@amir2024time].
 
-![Figure 6](./images/fig6.png)
+![Figure 6](./images/fig6.png){ width=50% } \
 
 ### Optimalitás
 
@@ -84,11 +84,11 @@ Az eredeti cikkben a mérésekhez még hozzávették az eddigi ismert megoldáso
 
 Az összehasonlíttásokat a két már látott példára, a Table II. táblázat foglalja össze, ezt a szimulációt mi is [lefuttathatjuk](https://kristofy.github.io/uniform-dispersion-problem/simulation).
 
-![Table II](./images/table2.png)
+![Table II](./images/table2.png) \
 
 Az algoritmus skáláhatóságának vizsgálására a Figure 9. kép szolgál
 
-![Figure 9](./images/fig9.png)
+![Figure 9](./images/fig9.png) \
 
 Itt megfigyelhegjuk hogy az FCDFS algortitmus mindig a legjobb, minden metrika alapján, hiszen mind az 5 kritérium alapján optimális.
 
