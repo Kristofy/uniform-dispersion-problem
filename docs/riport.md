@@ -8,6 +8,90 @@ geometry: margin=2cm
 output: pdf_document
 ---
 
+# Bevezetés
+
+Az eredeti cikk [@amir2024time] azzal a problémával foglalkozik, hogy miképpen lehetséges robotoknak egy sokaságával feltölteni egy rácsot.
+Vizsgálták, hogy a robotok képességei függvényében a rács feltöltését mennyire hatékonyan lehet elvégezni.
+Formalizálták, hogy miképpen lehetséges mérni a robotok képességeit, valamint a robotok teljesítményének mérésére szolgáló metrikákat.
+Megállapították, hogy olyan robotokkal, amelyek hangyaszerűek (vagyis csak a közvetlen környezetüket érzékelik), lehetséges egyszerre minimalizálni az elvégzési idő, távolság és energiafelhasználás szempontjából a tér kitöltését, hogyha az egyszerűen összekapcsolt.
+Általános térre bizonyították, hogy kizárólag a tér teljes ismerete mellett lehetséges az energia minimalizálása.
+
+## Korábbi eredmények, probléma leírása, modell
+
+Veszélyes területeken (például összeomlott épületekben) veszélyt jelent a terület feltérképezése, így gyakran alkalmaznak ilyen céllal automata robotokat.
+Ennek során sokszor egy pontból indítanak olcsón összeépíthető, autonóm működő robotokat egymás után, amelyek célja az, hogy az összes cellában legyen robot.
+Ezt a problémát "flooding"-nak, illetve "uniform dispersion"-nek nevezik. [@rm2004] [@quattrini2020] [@hsiang2004] [@rappel2019] [@barrameda2013] [@hideg2017] [@amir2020] [@rappel2023] [@barrameda2008] [@barrameda2014]
+
+A problémát diszkrét rácson vizsgálták, amely problémát [@hsiang2004] [@howard2002] szerzői írtak le.
+Egy-egy algoritmus hatékonyságát egy adott környezetben a következő módokon lehet mérni:
+
+- elvégzési idő hossza (makespan): mennyi idő szükséges a robotrajnak ahhoz, hogy beterítse a teljes teret;
+- távolság (travel distance): egy adott robot mekkora távolságot tett meg, ettől függ a robot amortizációja;
+- energia (energy): egy adott robot mennyi ideig volt bekapcsolva, különösen fontos robotikában az akkumulátor véges kapacitása miatt.
+
+A robot bekapcsolásának az ideje (energia) azt jelenti, hogy mennyi időn keresztül volt aktív.
+A robot, amikor aktív, dönthet, hogy ellép egy irányba, helyben marad, vagy leáll.
+Miután leállt, nincs lehetősége ismét bekapcsolni.
+
+$M$-mel jelöljük az elvégzési időt.
+$T_{max}$ jelöléssel jelöljük, hogy mekkora volt a legnagyobb megtett távolság egy robot által.
+$T_{total}$ jelöléssel jelöljük, hogy mekkora volt összesen a megtett távolság a robotok által.
+$E_{max}$ jelöléssel jelöljük, hogy mekkora volt a legnagyobb mennyiségű elfogyasztott energia egy robot által.
+$E_{total}$ jelöléssel jelöljük, hogy mekkora volt összesen az elfogyasztott enerigamennyiség a robotok által.
+
+[@demaine2009] [@liao2015] [@friggstad2011] foglalkoztak már azzal, hogy miképpen lehetne a metrikák mentén minél jobb eredményt elérni minél olcsóbb, illetve kisebb tudású robottal.
+
+Az eredeti cikkben [@amir2024time] formalizálták a robotok képességeit egy $(V,B,S)$ számhármassal.
+$V$ a látótávolságot, $B$ a robotok által egy lépésben átadható bitek mennyiségét jelenti a közeli robotokhoz, $S$ pedig a lépések között tárolt információmennyiséget jelenti bitekben mérve.
+A $V$ látótávolság azt jelenti, hogy pontosan azokat a cellákat látja, amelyek az aktuális pozíciójától legfeljebb $V$ Manhattan-távolságra vannak.
+$B$ bitnyi információt tud sugározni egy adott robot, amelyet más robotok a látótávolságukon belül látnak.
+$S$ pedig lényegében azt mutatja be, hogy mennyire lehet bonyolult az algoritmus, de egyes lépések számítására nem vonatkozik ez a korlát.
+
+Egy robot csak annyit lát, hogy egy adott mezőn szabad-e, nem tud alapvetően különbséget tenni falak és robotok között.
+Ez alól kivétel, hogyha a másik robot kommunikál.
+A kommunikáció a valóságban valószínűleg fénnyel vagy hanggal történhet.
+
+Két robot nem helyezkedhet el egy mezőn.
+Az algoritmusnak gondoskodnia kell arról, hogy ne akarjon két robot egy időpontban egyazon mezőre lépni.
+
+Két eltérő részprobléma van.
+Az egyik, amikor a robotok szinkronizáltak, vagyis diszkrét időpillanatokban mindegyik egyszerre aktív, és lép tovább.
+A másik eset, hogyha a robotok nem feltétlen egy időpontban aktívak.
+Ekkor ehy robot akkor is sugározza a kommunikációját, hogyha éppen nem aktív.
+
+Az elvégzéshez szükséges idő minimalizálható $(2, \mathcal{O}(1), \mathcal{O}(1))$ képességű robotokkal. [@hsiang2004]
+A megtett távolság minimalizálható $(2, 1, \mathcal{O}(n*\log n))$ robotokkal.
+Ugyanakkor az eredeti cikkben [@amir2024time] bizonyították, hogy általános gráfon csak olyan esetben lehet energiaoptimális módon feltölteni a teret, hogyha a robotok előre ismerik a területet.
+Vagyis a szükséges látótávolság függ a feltérképezendő területtől, hogyha szükséges energiaoptimális megoldást megadni.
+A cikk elsősorban azzal a problémával foglalkozott, hogy miképpen lehet energia-optimális megoldást készíteni speciális tulajdonságokkal rendelkező terekben, nevezetesen az egyszerűen összekapcsolt terekben.
+
+Az egyszerűen összekapcsolt térnél a bejárható mezők egy összefüggő teret alkotnak, ahogy a nem bejárható cellák is.
+Vagyis nincsenek benne lyukak.
+
+Az eredeti cikkben egy olyan algoritmust mutattak be, amely egy ilyen robotraj tagjaival lényegében egy mélységi bejárást hajt végre, amelyet FCDFS-nek neveztek a szerzők.
+Aszinkron esetben AFCDFS-nek nevezték a megoldásukat.
+
+## Elméleti korlátok
+
+$(\infty, \infty, \infty)$ robotok teljes mértékben ismerik a környezetet, képesek a legjobb megoldást megtalálni.
+Az alábbi állítások bizonyításai az eredeti cikkben találhatóak [@amir2024time].
+
+Ilyen robotok által elérhető (optimális) metrikákat $M^{*}$, $T^{*}_{max}$, $T^{*}_{total}$, $E^{*}_{max}$, $E^{*}_{total}$ jelölésekkel jelöljük, ennél jobb eredmény az adott metrika szerint nem érhető el.
+
+Ha a feltöltendő mezők $v_1, v_2, \ldots, v_n$, és a kiindulási pont $s$, akkor:
+
+- $E_{total} - n \geq T_{total} \geq \sum^n_{i=1} dist(s, v_i)$
+- $E_{max} - 1 \geq T_{max} \geq max_{1\leq i\leq n} dist(s, v_i)$
+- $M \geq 2*n$
+
+Optimális robotokkal elérhető az egyenlőség is:
+
+- $E^{*}_{total} - n = T^{*}_{total} = \sum^n_{i=1} dist(s, v_i)$
+- $E^{*}_{max} - 1 = T^{*}_{max} = max_{1\leq i\leq n} dist(s, v_i)$
+- $M^{*} = 2*n$
+
+Ugyanerre képesek $(\infty, 0, 0)$ robotok is.
+
 \newpage
 
 # Algoritmus
@@ -99,8 +183,8 @@ Az algoritmus során:
 
 - Minden robot optimális úton halad a végcéljához.
 - Minden körben minden robot lép egyet, és ez garantálja, hogy:
-  - A **maximális mozgások száma** (\( T\_{max} \)) optimális.
-  - Az **összes mozgás száma** (\( T\_{total} \)) optimális.
+  - A **maximális mozgások száma** ($T_{max}$) optimális.
+  - Az **összes mozgás száma** ($T_{total}$) optimális.
   - A robotok **összes energiafogyasztása** és **maximális energiafogyasztása** is optimális, mivel minden robot minden körben lép, és egy kör alatt megáll.
 
 Ezáltal az algoritmus **teljesítési ideje** is optimális.
